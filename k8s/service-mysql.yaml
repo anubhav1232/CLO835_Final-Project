@@ -9,4 +9,4 @@ spec:
     - protocol: TCP
       port: 3306
       targetPort: 3306
-  clusterIP: None  # Headless service to allow Flask to connect directly to MySQL pods
+  clusterIP: None  # Headless service for direct access
