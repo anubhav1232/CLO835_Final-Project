@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  background_image_url: "https://s3.amazonaws.com/your-bucket-name/background-image.jpg"
+  app_name: "Your Name"

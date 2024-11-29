@@ -1,8 +1,32 @@
-# CLO835 Final Project: Deployment of 2-Tiered Web Application
-This project involves deploying a 2-tiered web application using Kubernetes on Amazon EKS.
+# CLO835 Final Project: Flask App on EKS
 
-## Setup Instructions
-1. Clone this repository.
-2. Build the Docker image locally.
-3. Set up GitHub Actions for CI/CD.
-4. Deploy the application to Amazon EKS.
+This repository contains the code and Kubernetes manifests for deploying a Flask-based web application on Amazon EKS. The application retrieves a background image from a private S3 bucket and displays it on the homepage. The image URL and other configuration values are stored in a ConfigMap.
+
+## Setup
+
+### Prerequisites
+- AWS Account with IAM permissions for EKS, ECR, S3, etc.
+- eksctl installed
+- kubectl installed
+- Docker installed
+
+### Steps
+
+1. **Build and Push Docker Image**
+   - Build the Docker image for the Flask app and push it to ECR.
+
+2. **Create EKS Cluster**
+   - Create the EKS cluster using `eksctl`.
+
+3. **Deploy MySQL and Flask App**
+   - Apply the Kubernetes manifests (`kubectl apply -f k8s/`) to deploy MySQL and the Flask app.
+
+4. **Set up CI/CD with GitHub Actions**
+   - Configure GitHub Actions to automatically build and push Docker images.
+
+5. **Configure Flux for Automatic Deployment (Optional)**
+   - Use Flux to sync Kubernetes manifests from GitHub.
+
+### Accessing the Application
+
+Once deployed, access the Flask app via the external LoadBalancer URL provided by the Kubernetes service.

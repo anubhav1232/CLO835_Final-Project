@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flask-app
+  template:
+    metadata:
+      labels:
+        app: flask-app
+    spec:
+      containers:
+        - name: flask-app
+          image: your-ecr-repo-url/flask-app:latest
+          ports:
+            - containerPort: 81
+          env:
+            - name: DBHOST
+              value: "mysql-service"
+            - name: DBUSER
+              value: "root"
+            - name: DBPWD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: password
+            - name: DATABASE
+              value: "employees"
+            - name: BACKGROUND_IMAGE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: background_image_url
