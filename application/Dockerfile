@@ -6,25 +6,30 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Update apt package list and install system dependencies
 RUN apt-get update -y \
-    && apt-get install -y \
+    && apt-get install -y --no-install-recommends \
     python3-pip \
+    python3-dev \
     mysql-client \
-    && apt-get clean
+    build-essential \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the current directory content into the container's /app directory
-COPY . /app
+# Copy only the necessary files first for dependency installation
+COPY requirements.txt /app/
 
 # Upgrade pip to the latest version
-RUN pip install --upgrade pip
+RUN pip install --no-cache-dir --upgrade pip
 
 # Install required Python dependencies
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port 8080 for the Flask app to be accessible
-EXPOSE 8080
+# Copy the rest of the application code
+COPY . /app
+
+# Expose port 81 for the Flask app to be accessible
+EXPOSE 81
 
 # Set the default command to run the Flask app using python3
 ENTRYPOINT [ "python3" ]
