@@ -1,81 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Add Employee Information</title>
-    <style>
-        body {
-            background: url('{{ background_image_url }}') no-repeat center center fixed;
-            background-size: cover;
-            color: white;
-            font-family: Avenir, sans-serif;
-        }
-        .form-container {
-            background-color: rgba(0, 0, 0, 0.6);
-            padding: 20px;
-            border-radius: 10px;
-            width: 50%;
-            margin: 0 auto;
-        }
-        h1 {
-            color: DodgerBlue;
-        }
-        input[type="text"], input[type="number"] {
-            height: 25px;
-            font-size: 14pt;
-            color: grey;
-            width: 100%;
-            padding: 5px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        button {
-            background-color: grey;
-            height: 45px;
-            width: 200px;
-            color: white;
-            font-style: oblique;
-            border: none;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
-        a {
-            color: DodgerBlue;
-            text-decoration: none;
-            font-size: 18px;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
+	<title>Add Employee Information {{group_name}}</title>
 </head>
-<body>
+<center>
+	<font color="black" size="4" style="font-family: avenir">
 
-    <div class="form-container">
-        <h1>Employee Database</h1>
-        <form action="/addemp" autocomplete="on" method="POST" enctype="multipart/form-data">
-            <label for="emp_id">Employee ID:</label><br>
-            <input type="number" name="emp_id" id="emp_id" autofocus required><br><br>
+		<h1 style="color: DodgerBlue">Employee Database</h1>
+		<body style="background-image: url('{{ background_image }}');" >
 
-            <label for="first_name">First Name:</label><br>
-            <input type="text" name="first_name" id="first_name" required><br><br>
+			<form action="/addemp" autocomplete="on" method = "POST" enctype="multipart/form-data">
 
-            <label for="last_name">Last Name:</label><br>
-            <input type="text" name="last_name" id="last_name" required><br><br>
+			
 
-            <label for="primary_skill">Primary Skills:</label><br>
-            <input type="text" name="primary_skill" id="primary_skill" required><br><br>
+		  		Employee ID:<br> <input style="height:25px;font-size:14pt; color:grey;" type="number" name="emp_id" autofocus size="40"><br><br>
 
-            <label for="location">Location:</label><br>
-            <input type="text" name="location" id="location" required><br><br>
+		  		First Name:<br> <input style="height:25px;font-size:14pt;color:grey;" type="text" name="first_name" ><br><br>
 
-            <button type="submit">Update Database</button><br><br>
-            <button type="submit" formaction="/getemp">Get Employee Information</button><br><br>
-        </form>
-    </div>
+		  		Last Name:<br> <input style="height:25px;font-size:14pt;color:grey;" type="text" name="last_name"><br><br>
 
-    <br><br>
-    <a href="/about">About Us</a>
+		  		Primary Skills:<br> <input style="height:25px;font-size:14pt;color:grey;" type="text" name="primary_skill"><br><br>
 
-</body>
+		  		Location:<br> <input style="height:25px;font-size:14pt;color:grey;" type="text" name="location"><br><br>
+
+		  		<button type="submit" style="background: grey; height: 45px; width: 200px; color: white; size: 5; font:oblique;">UPDATE DATABASE</button><br><br>
+		  		<button type="submit" formaction="/getemp" style="background: grey; height: 45px; width: 200px; color:white; font:oblique;">GET EMPLOYEE INFORMATION</button><br><br>
+
+			</form>
+			<br><br><br><br><br><br><br><br>
+            <a href="/about">About Us</a>
+		</body>
+
+	</font>
+</center>
 </html>
