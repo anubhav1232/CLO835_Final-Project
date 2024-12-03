@@ -45,6 +45,7 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: "latest"
         run: |
+          cd CLO835_Final-Project/application
           docker build -t $ECR_REGISTRY/${REPOSITORY_NAME}:${DATABASE_IMAGE_NAME}-${IMAGE_TAG} -f Dockerfile_mysql .
           docker push $ECR_REGISTRY/${REPOSITORY_NAME}:${DATABASE_IMAGE_NAME}-${IMAGE_TAG}
 
@@ -54,5 +55,6 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: "latest"
         run: |
+          cd CLO835_Final-Project/application
           docker build -t $ECR_REGISTRY/${REPOSITORY_NAME}:${APPLICATION_IMAGE_NAME}-${IMAGE_TAG} .
           docker push $ECR_REGISTRY/${REPOSITORY_NAME}:${APPLICATION_IMAGE_NAME}-${IMAGE_TAG}
