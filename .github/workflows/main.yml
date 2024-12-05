@@ -42,14 +42,19 @@ jobs:
       - name: Build, tag, and push MySQL image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: "latest"
         run: |
-          docker build -t $ECR_REGISTRY/${REPOSITORY_NAME}:mysql-app:latest \
+          # Build the MySQL Docker image
+          docker build -t $ECR_REGISTRY/${REPOSITORY_NAME}:${DATABASE_IMAGE_NAME}_${IMAGE_TAG} \
             -f ./application/Dockerfile_mysql ./application
-          docker push $ECR_REGISTRY/${REPOSITORY_NAME}:mysql-app:latest
+          docker push $ECR_REGISTRY/${REPOSITORY_NAME}:${DATABASE_IMAGE_NAME}_${IMAGE_TAG}
 
       - name: Build, tag, and push Flask app image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: "latest"
         run: |
-          docker build -t $ECR_REGISTRY/${REPOSITORY_NAME}:flask-app:latest ./application
-          docker push $ECR_REGISTRY/${REPOSITORY_NAME}:flask-app:latest
+          # Build the Flask app Docker image
+          docker build -t $ECR_REGISTRY/${REPOSITORY_NAME}:${APPLICATION_IMAGE_NAME}_${IMAGE_TAG} \
+            ./application
+          docker push $ECR_REGISTRY/${REPOSITORY_NAME}:${APPLICATION_IMAGE_NAME}_${IMAGE_TAG}
