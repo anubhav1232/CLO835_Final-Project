@@ -30,3 +30,49 @@ This repository contains the code and Kubernetes manifests for deploying a Flask
 ### Accessing the Application
 
 Once deployed, access the Flask app via the external LoadBalancer URL provided by the Kubernetes service.
+
+
+```eksctl create cluster -f eks-cluster.yaml
+kubectl apply -f namespace.yaml
+kubectl apply -f storageclass.yaml
+kubectl apply -f persistent-volume-claim.yaml
+kubectl apply -f secret-db-credentials.yaml 
+kubectl apply -f serviceaccount.yaml 
+kubectl apply -f service-mysql.yaml
+kubectl apply -f statefulset.yaml
+kubectl apply -f deployment-mysql.yaml 
+
+kubectl apply -f config-map.yaml
+kubectl apply -f deployment-flask.yaml 
+kubectl apply -f role-clusterrole.yaml 
+kubectl apply -f rolebinding.yaml
+kubectl apply -f service-flask.yaml 
+
+kubectl get all -n final
+#get load balancer url to show 
+
+kubectl get pv
+kubectl get pvc -n final
+
+kubectl exec -it mysql-0 -n final -- mysql -u root -p
+
+>> USE employees;
+>> SELECT * FROM employee;
+>> INSERT INTO employee VALUES ('1','Anubhav','Vijay','Parikshek','local');
+
+kubectl delete pod mysql-0 -n final
+
+#Wait for pod to come back
+kubectl exec -it mysql-0 -n final -- mysql -u root -p
+
+>> USE employees;
+>> SELECT * FROM employee;
+
+
+
+kubectl get service flask-service -n final  
+
+kubectl apply -f hpa.yaml
+for i in {1..1000}; do curl -s http://adbf823bb7d7f44f1bc7e95799bacc03-1367741731.us-east-1.elb.amazonaws.com > /dev/null & done
+wait
+```
