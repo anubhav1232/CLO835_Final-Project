@@ -43,7 +43,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          docker build -t $ECR_REGISTRY/${REPOSITORY_NAME}/mysql-app:latest \
+          docker build -t $ECR_REGISTRY/${REPOSITORY_NAME}:mysql-app:latest \
             -f ./application/Dockerfile_mysql ./application
           docker push $ECR_REGISTRY/${REPOSITORY_NAME}:mysql-app:latest
 
@@ -51,5 +51,5 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          docker build -t $ECR_REGISTRY/${REPOSITORY_NAME}/flask-app:latest ./application
+          docker build -t $ECR_REGISTRY/${REPOSITORY_NAME}:flask-app:latest ./application
           docker push $ECR_REGISTRY/${REPOSITORY_NAME}:flask-app:latest
