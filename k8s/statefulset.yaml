@@ -35,7 +35,7 @@ spec:
       volumes:
       - name: mysql-data
         persistentVolumeClaim:
-          claimName: database-pvc
+          claimName: mysql-pvc
   volumeClaimTemplates:
   - metadata:
       name: mysql-data
