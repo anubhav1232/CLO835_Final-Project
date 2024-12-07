@@ -73,6 +73,18 @@ kubectl exec -it mysql-0 -n final -- mysql -u root -p
 kubectl get service flask-service -n final  
 
 kubectl apply -f hpa.yaml
-for i in {1..1000}; do curl -s http://adbf823bb7d7f44f1bc7e95799bacc03-1367741731.us-east-1.elb.amazonaws.com > /dev/null & done
-wait
+
+while true; do curl -s http://adbf823bb7d7f44f1bc7e95799bacc03-1367741731.us-east-1.elb.amazonaws.com > /dev/null; sleep 1; echo "Hit Successful"; done
+
+
+# Do changes in config-map.yaml file
+kubectl apply -f config-map.yaml -n final                                                                                
+kubectl delete deployment flask-app -n final                                                                              
+kubectl apply -f deployment-flask.yaml   
+
+kubectl get pods -n final                                                                             
+kubectl get all -n final
+
+#vist load balancer URL from here
+
 ```

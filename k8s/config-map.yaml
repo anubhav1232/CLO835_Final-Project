@@ -4,9 +4,10 @@ metadata:
   name: clo835
   namespace: final
 data:
-  BACKGROUND_IMAGE: "https://clo835-privatebucket.s3.us-east-1.amazonaws.com/private-image.jpg"
+  BACKGROUND_IMAGE: "https://clo835-privatebucket.s3.us-east-1.amazonaws.com/private-image2.jpg"
   GROUP_NAME: "GROUP4"
   APP_COLOR: "lime"
+  DBHOST: "mysql"
   DBPWD: "password"
   DATABASE: "employees"
   DBPORT: "3306"
