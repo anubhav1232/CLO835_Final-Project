@@ -1,4 +1,3 @@
-#Dummy commit
 
 # CLO835 Final Project: Flask App on EKS
 
