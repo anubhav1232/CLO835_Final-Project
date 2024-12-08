@@ -1,148 +1,171 @@
+# **CLO835 Final Project: Flask App Deployment on AWS EKS**
 
-# CLO835 Final Project: Flask App on EKS
+This repository contains the codebase and Kubernetes manifests for deploying a cloud-native Flask-based Employee Management Application on an Amazon Elastic Kubernetes Service (EKS) cluster. The application integrates with a MySQL database and dynamically retrieves a background image from a private Amazon S3 bucket. This project showcases the use of Kubernetes objects, CI/CD pipelines, and cloud infrastructure.
 
-This repository contains the code and Kubernetes manifests for deploying a Flask-based web application on Amazon EKS. The application retrieves a background image from a private S3 bucket and displays it on the homepage. The image URL and other configuration values are stored in a ConfigMap.
+---
 
-## Setup
+## **Team Members**
+- **Anubhav Thakur** ([GitHub: @anubhav1232](https://github.com/anubhav1232))
+- **Parikshek Gaju** ([GitHub: @Parikshek](https://github.com/Parikshek))
+- **Vijay Kumar** ([GitHub: @booleandigit](https://github.com/booleandigit))
 
-### Prerequisites
-- AWS Account with IAM permissions for EKS, ECR, S3, etc.
-- eksctl installed
-- kubectl installed
-- Docker installed
+---
 
-### Steps
+## **Project Objectives**
+1. Deploy a Flask application and a MySQL database on AWS EKS using Kubernetes.
+2. Integrate the application with AWS services, including Amazon S3 for assets and Amazon EBS for persistent storage.
+3. Use Kubernetes resources such as ConfigMaps, Secrets, StatefulSets, and PersistentVolumeClaims to manage the deployment.
+4. Set up CI/CD pipelines using GitHub Actions for automated Docker image builds and pushes to Amazon Elastic Container Registry (ECR).
+5. Demonstrate advanced Kubernetes functionalities such as Horizontal Pod Autoscaling (HPA) and dynamic storage provisioning.
 
-1. **Build and Push Docker Image**
-   - Build the Docker image for the Flask app and push it to ECR.
+---
 
-2. **Create EKS Cluster**
-   - Create the EKS cluster using `eksctl`.
+## **Prerequisites**
+Before proceeding, ensure the following tools and configurations are in place:
+- An AWS account with sufficient permissions for EKS, ECR, and S3.
+- **Installed Tools**:
+  - `eksctl` for cluster management.
+  - `kubectl` for Kubernetes resource management.
+  - `Docker` for containerization.
+- **AWS CLI**: Configured with access keys for your account.
+- A private Amazon S3 bucket to store the application’s background image.
 
-3. **Deploy MySQL and Flask App**
-   - Apply the Kubernetes manifests (`kubectl apply -f k8s/`) to deploy MySQL and the Flask app.
+---
 
-4. **Set up CI/CD with GitHub Actions**
-   - Configure GitHub Actions to automatically build and push Docker images.
+## **Deployment Steps**
 
-5. **Configure Flux for Automatic Deployment (Optional)**
-   - Use Flux to sync Kubernetes manifests from GitHub.
+### **1. Build and Push Docker Images**
+1. Build the Docker images for the Flask application and MySQL database:
+   ```bash
+   docker build -t flask-app -f application/Dockerfile application/
+   docker build -t mysql-app -f application/Dockerfile_mysql application/
+   ```
+2. Push the images to Amazon ECR:
+   ```bash
+   docker tag flask-app <ECR_REPO_URL>/flask-app:latest
+   docker push <ECR_REPO_URL>/flask-app:latest
 
-### Accessing the Application
+   docker tag mysql-app <ECR_REPO_URL>/mysql-app:latest
+   docker push <ECR_REPO_URL>/mysql-app:latest
+   ```
 
-Once deployed, access the Flask app via the external LoadBalancer URL provided by the Kubernetes service.
+---
 
+### **2. Create EKS Cluster**
+1. Define your cluster configuration in `eks/eks-cluster.yaml`.
+2. Create the EKS cluster using `eksctl`:
+   ```bash
+   eksctl create cluster -f eks/eks-cluster.yaml
+   ```
 
-```
+---
 
-# CLO835 Final Project: Flask App on EKS
+### **3. Deploy Kubernetes Resources**
+1. Deploy the **namespace** and **storage configurations**:
+   ```bash
+   kubectl apply -f k8s/namespace.yaml
+   kubectl apply -f k8s/storageclass.yaml
+   kubectl apply -f k8s/persistent-volume-claim.yaml
+   ```
 
-This repository contains the code and Kubernetes manifests for deploying a Flask-based web application on Amazon EKS. The application retrieves a background image from a private S3 bucket and displays it on the homepage. The image URL and other configuration values are stored in a ConfigMap.
+2. Deploy **MySQL database**:
+   ```bash
+   kubectl apply -f k8s/secret-db-credentials.yaml
+   kubectl apply -f k8s/service-mysql.yaml
+   kubectl apply -f k8s/statefulset.yaml
+   kubectl apply -f k8s/deployment-mysql.yaml
+   ```
 
-## Setup
+3. Deploy the **Flask application**:
+   ```bash
+   kubectl apply -f k8s/config-map.yaml
+   kubectl apply -f k8s/deployment-flask.yaml
+   kubectl apply -f k8s/service-flask.yaml
+   ```
 
-### Prerequisites
-- AWS Account with IAM permissions for EKS, ECR, S3, etc.
-- eksctl installed
-- kubectl installed
-- Docker installed
+4. Set up RBAC for the cluster:
+   ```bash
+   kubectl apply -f k8s/role-clusterrole.yaml
+   kubectl apply -f k8s/rolebinding.yaml
+   kubectl apply -f k8s/serviceaccount.yaml
+   ```
 
-### Steps
+---
 
-1. **Build and Push Docker Image**
-   - Build the Docker image for the Flask app and push it to ECR.
+### **4. Verify the Deployment**
+1. Check all resources in the namespace:
+   ```bash
+   kubectl get all -n final
+   ```
+2. Access the Flask application using the external LoadBalancer URL:
+   ```bash
+   kubectl get service flask-service -n final
+   ```
 
-2. **Create EKS Cluster**
-   - Create the EKS cluster using `eksctl`.
+---
 
-3. **Deploy MySQL and Flask App**
-   - Apply the Kubernetes manifests (`kubectl apply -f k8s/`) to deploy MySQL and the Flask app.
+### **5. Test Application Functionality**
+1. Log into the MySQL database pod and verify data persistence:
+   ```bash
+   kubectl exec -it mysql-0 -n final -- mysql -u root -p
+   ```
+   Run SQL queries to test:
+   ```sql
+   USE employees;
+   INSERT INTO employee VALUES ('12345','Anubhav','Vijay','Parikshek','local');
+   SELECT * FROM employee;
+   ```
 
-4. **Set up CI/CD with GitHub Actions**
-   - Configure GitHub Actions to automatically build and push Docker images.
+2. Test application functionality in the browser:
+   - Add and retrieve employee records.
+   - Confirm that the application fetches the background image from the S3 bucket.
 
-5. **Configure Flux for Automatic Deployment (Optional)**
-   - Use Flux to sync Kubernetes manifests from GitHub.
+3. Test dynamic storage provisioning:
+   - Delete the MySQL pod:
+     ```bash
+     kubectl delete pod mysql-0 -n final
+     ```
+   - Confirm data persistence after the pod restarts.
 
-### Accessing the Application
+---
 
-Once deployed, access the Flask app via the external LoadBalancer URL provided by the Kubernetes service.
+### **6. Configure Horizontal Pod Autoscaling (HPA)**
+1. Apply the HPA configuration:
+   ```bash
+   kubectl apply -f k8s/hpa.yaml
+   ```
+2. Simulate traffic to trigger autoscaling:
+   ```bash
+   while true; do curl -s <LOAD_BALANCER_URL> > /dev/null; echo "Hit Successful"; done
+   ```
 
+---
 
-```#Vijay
+### **7. Update Background Image**
+1. Update the background image URL in `k8s/config-map.yaml`.
+2. Redeploy the ConfigMap and Flask application:
+   ```bash
+   kubectl apply -f k8s/config-map.yaml -n final
+   kubectl delete deployment flask-app -n final
+   kubectl apply -f k8s/deployment-flask.yaml
+   ```
 
-#Demonstrate the application functionality locally using Docker images.
-#Show the automatic creation and pushing of the application image to Amazon ECR using GitHub Actions.
+3. Verify that the updated image appears on the application homepage.
 
-# Anubhav
-#Display the application deployment into the "final" namespace on Amazon EKS.
-#Verify that the application loads the background image from a private Amazon S3 bucket.
-#Confirm data persistence when a pod is deleted and re-created by the ReplicaSet.
-#Prove that an Amazon EBS volume and Kubernetes PersistentVolume are dynamically created when the application pod is deployed.
+---
 
-#Parikshek
-#Demonstrate Internet access to the application.
-#Change the background image URL in the ConfigMap and verify that the new image appears in the browser.
-#(Bonus) Show auto-scaling functionality in response to traffic load.
+## **Key Features**
+1. **Dynamic Resource Allocation**: Amazon EBS volumes and Kubernetes PersistentVolumes dynamically provisioned for the MySQL database.
+2. **CI/CD Integration**: GitHub Actions configured for automated Docker image builds and pushes.
+3. **Auto-scaling**: HPA configuration to scale application pods based on CPU usage.
+4. **Secure Configuration Management**: ConfigMaps and Secrets used to manage application configurations and credentials.
+5. **Data Persistence**: Ensured through StatefulSets and PersistentVolumes.
 
-docker pull relevant images
+---
 
-docker network create my-network
-docker run --name mysql-app --env-file .env_mysql -d --network my-network -p 3306:3306 318623136204.dkr.ecr.us-east-1.amazonaws.com/docker-containers:mysql-app_latest
-docker run --name flask-app --env-file .env -d --network my-network -p 81:81 318623136204.dkr.ecr.us-east-1.amazonaws.com/docker-containers:flask-app_latest
+## **Future Enhancements**
+- Add SSL/TLS termination using an Ingress controller.
+- Monitor resource usage with Prometheus and Grafana.
+- Implement end-to-end CI/CD with automated deployments using FluxCD.
 
-eksctl create cluster -f eks-cluster.yaml
-
-kubectl apply -f namespace.yaml
-kubectl apply -f storageclass.yaml
-kubectl apply -f persistent-volume-claim.yaml
-kubectl apply -f secret-db-credentials.yaml 
-kubectl apply -f serviceaccount.yaml 
-kubectl apply -f service-mysql.yaml
-kubectl apply -f statefulset.yaml
-kubectl apply -f deployment-mysql.yaml 
-
-kubectl apply -f config-map.yaml
-kubectl apply -f deployment-flask.yaml 
-kubectl apply -f role-clusterrole.yaml 
-kubectl apply -f rolebinding.yaml
-kubectl apply -f service-flask.yaml 
-
-kubectl get all -n final
-#get load balancer url to show 
-
-kubectl get pv
-kubectl get pvc -n final
-
-kubectl exec -it mysql-0 -n final -- mysql -u root -p
-
-#>> USE employees;
-#>> SELECT * FROM employee;
-#>> INSERT INTO employee VALUES ('12345','Anubhav','Vijay','Parikshek','local');
-
-kubectl delete pod mysql-0 -n final
-
-#Wait for pod to come back
-kubectl exec -it mysql-0 -n final -- mysql -u root -p
-
-#>> USE employees;
-#>> SELECT * FROM employee;
-
-kubectl get service flask-service -n final  
-
-kubectl apply -f hpa.yaml
-
-while true; do curl -s http://adbf823bb7d7f44f1bc7e95799bacc03-1367741731.us-east-1.elb.amazonaws.com > /dev/null; echo "Hit Successful"; done
-
-
-# Do changes in config-map.yaml file
-kubectl apply -f config-map.yaml -n final                                                                                
-kubectl delete deployment flask-app -n final                                                                              
-kubectl apply -f deployment-flask.yaml   
-
-kubectl get pods -n final                                                                             
-kubectl get all -n final
-
-#vist load balancer URL from here
-```
-```
+---
